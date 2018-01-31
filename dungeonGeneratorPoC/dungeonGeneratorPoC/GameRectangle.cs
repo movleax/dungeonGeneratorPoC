@@ -13,8 +13,11 @@ namespace dungeonGeneratorPoC
         private Int32 width, height;
         private Point position;
         private Color rectColor;
+
+        // do not allow the outside world to create GameRectangle objects using the default constructor
         private GameRectangle() { }
 
+        // must use this constructor to make GameRectangle objects
         public GameRectangle(Int32 x, Int32 y, Int32 width, Int32 height, Color color)
         {
             this.position.X = x;
@@ -24,6 +27,15 @@ namespace dungeonGeneratorPoC
             this.rectColor = color;
         }
 
+        /// <summary>
+        /// In order to draw a GameRectangle, we must include a parent position.
+        /// The parent position will be applied to the gameRect's position.
+        /// This makes it easier to use this GameRect class with the PreFab class since we only have 
+        /// to pass in the prefab pieces position to move this object around in conjunction with other pieces.
+        /// Will call the private member draw method
+        /// </summary>
+        /// <param name="g">form's Control</param>
+        /// <param name="parentPosition">The parents position</param>
         public void draw(Control g, Point parentPosition)
         {
             Point tempPos = position;
@@ -35,11 +47,7 @@ namespace dungeonGeneratorPoC
             position = tempPos;
         }
 
-        public Point GetPosition()
-        {
-            return position;
-        }
-
+        // see the overloaded public draw method
         private void draw(Control g)
         {
             System.Drawing.SolidBrush myBrush = new System.Drawing.SolidBrush(rectColor);
@@ -48,6 +56,11 @@ namespace dungeonGeneratorPoC
             formGraphics.FillRectangle(myBrush, new Rectangle(position.X, position.Y, width, height));
             myBrush.Dispose();
             formGraphics.Dispose();
+        }
+
+        public Point GetPosition()
+        {
+            return position;
         }
     }
 }
