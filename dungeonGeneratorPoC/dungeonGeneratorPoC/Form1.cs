@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace dungeonGeneratorPoC
 {
@@ -17,8 +19,14 @@ namespace dungeonGeneratorPoC
         public Form1()
         {
             InitializeComponent();
-            Prefab p = new Prefab(@"c:\users\austin\documents\visual studio 2015\Projects\simple_rect\simple_rect\resources\BigRoom.txt");
-            PrefabPieces.Add(p);
+
+            string prefabContentFolder = ConfigurationManager.AppSettings["prefabFolder"];
+            string[] filePaths = Directory.GetFiles(prefabContentFolder, "*.txt");
+
+            foreach (var fp in filePaths)
+            {
+                PrefabPieces.Add(new Prefab(fp));
+            }
         }
 
         protected override void OnPaint(PaintEventArgs e)

@@ -12,17 +12,24 @@ namespace dungeonGeneratorPoC
     class Prefab
     {
         private List<ConnectionPoint> Doorways = new List<ConnectionPoint>();
-        private GameRectangle rect;
+        private List<GameRectangle> rectangles = new List<GameRectangle>();
         private Prefab() { }
+        private Point position;
+        private Color color;
 
         public Prefab(String PrefabFile)
         {
+            Random rand = new Random((int)DateTime.Now.Ticks);
+            color = Color.FromArgb(rand.Next(256), rand.Next(256), rand.Next(256));
+            position = new Point(0, 0);
+
             GeneratePrefabPiece(PrefabFile);
         }
 
         public void draw(Control g)
         {
-            rect.draw(g);
+            foreach(var gameRect in rectangles)
+                gameRect.draw(g, this.position);
         }
 
         void GeneratePrefabPiece(string PrefabFile)
@@ -31,61 +38,66 @@ namespace dungeonGeneratorPoC
             {
                 StreamReader reader = new StreamReader(PrefabFile);
                 char ch;
-                Int32 width = new Int32();
-                Int32 height = new Int32();
 
                 Point currentPos = new Point(0, 0);
+                bool addBlock;
 
                 do
                 {
                     ch = (char)reader.Read();
+                    ch = Char.ToUpper(ch);
+                    addBlock = false;
+
                     Console.Write(ch);
                     if (ch == 'N')
                     {
                         Doorways.Add(new ConnectionPoint(currentPos, Direction.North));
+                        addBlock = true;
                     }
                     else if (ch == 'S')
                     {
                         Doorways.Add(new ConnectionPoint(currentPos, Direction.South));
+                        addBlock = true;
                     }
                     else if (ch == 'E')
                     {
                         Doorways.Add(new ConnectionPoint(currentPos, Direction.East));
+                        addBlock = true;
                     }
                     else if (ch == 'W')
                     {
                         Doorways.Add(new ConnectionPoint(currentPos, Direction.West));
+                        addBlock = true;
+                    }
+                    else if (ch == 'X')
+                    {
+                        addBlock = true;
                     }
 
+                    // adjust position
                     if (ch == '\r')
                     {
                         currentPos.X = 0;
                         currentPos.Y += Constants.RectangleChunk;
-
-                        if (currentPos.Y > height)
-                            height += Constants.RectangleChunk;
                     }
                     else if(ch != '\n')
                     {
                         currentPos.X += Constants.RectangleChunk;
-
-                        if (currentPos.X > width)
-                            width += Constants.RectangleChunk;
                     }
-                    
+
+                    // add a game rectangle to our prefab list 
+                    if(addBlock)
+                        rectangles.Add(new GameRectangle(currentPos.X, currentPos.Y, Constants.RectangleChunk, Constants.RectangleChunk, color));
 
                 } while (!reader.EndOfStream);
 
                 reader.Close();
                 reader.Dispose();
 
-                // lastly create the gameRectangle
-                rect = new GameRectangle(200, 200, width, height);
-
             }
             catch (IOException e)
             {
-                Console.WriteLine(e.ToString());
+                MessageBox.Show(e.ToString());
             }
         }
     }

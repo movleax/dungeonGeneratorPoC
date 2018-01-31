@@ -11,25 +11,38 @@ namespace dungeonGeneratorPoC
     class GameRectangle
     {
         private Int32 width, height;
-        public Point position;
+        private Point position;
         private Color rectColor;
         private GameRectangle() { }
 
-        public GameRectangle(Int32 x, Int32 y, Int32 width, Int32 height)
+        public GameRectangle(Int32 x, Int32 y, Int32 width, Int32 height, Color color)
         {
-            position.X = x;
-            position.Y = y;
+            this.position.X = x;
+            this.position.Y = y;
             this.width = width;
             this.height = height;
-            this.rectColor = new Color();
-
-            Random r = new Random();
-            this.rectColor = Color.FromArgb(r.Next(256), r.Next(256), r.Next(256));
+            this.rectColor = color;
         }
 
-        public void draw(Control g)
+        public void draw(Control g, Point parentPosition)
         {
-            System.Drawing.SolidBrush myBrush = new System.Drawing.SolidBrush(System.Drawing.Color.Red);
+            Point tempPos = position;
+            position.X += parentPosition.X;
+            position.Y += parentPosition.Y;
+
+            draw(g);
+
+            position = tempPos;
+        }
+
+        public Point GetPosition()
+        {
+            return position;
+        }
+
+        private void draw(Control g)
+        {
+            System.Drawing.SolidBrush myBrush = new System.Drawing.SolidBrush(rectColor);
             System.Drawing.Graphics formGraphics;
             formGraphics = g.CreateGraphics();
             formGraphics.FillRectangle(myBrush, new Rectangle(position.X, position.Y, width, height));
