@@ -15,6 +15,7 @@ namespace dungeonGeneratorPoC
     public partial class Form1 : Form
     {
         List<Prefab> PrefabPieces = new List<Prefab>();
+        ResourceManager resMan = ResourceManager.GetInstance();
 
         public Form1()
         {
@@ -24,10 +25,10 @@ namespace dungeonGeneratorPoC
             string prefabContentFolder = ConfigurationManager.AppSettings["prefabFolder"];
             string[] filePaths = Directory.GetFiles(prefabContentFolder, "*.txt");
 
-            // Given our filePaths we found above, create a Prefab constructors and add to our PrefabPieces list
+            // Given our filePaths we found above, create a Prefab and add to our PrefabPieces list
             foreach (var fp in filePaths)
             {
-                PrefabPieces.Add(new Prefab(fp));
+                resMan.AddPrefabBluePrint(new PrefabBluePrint(fp));
             }
         }
 

@@ -15,6 +15,7 @@ namespace dungeonGeneratorPoC
         private List<GameRectangle> rectangles = new List<GameRectangle>();
         private Point position;
         private Color color;
+        private string prefabID;
 
         // do not allow prefab objects to be made with the default constructor in the outside world
         private Prefab() { }
@@ -28,6 +29,7 @@ namespace dungeonGeneratorPoC
             Random rand = new Random((int)DateTime.Now.Ticks);
             color = Color.FromArgb(rand.Next(256), rand.Next(256), rand.Next(256));
             position = new Point(0, 0);
+            prefabID = Guid.NewGuid().ToString();
 
             GeneratePrefabPiece(PrefabFile);
         }
@@ -86,22 +88,22 @@ namespace dungeonGeneratorPoC
                     // check the ascii value and respond appropriately (see function header for details)
                     if (ch == 'N')
                     {
-                        Doorways.Add(new ConnectionPoint(currentPos, Direction.North));
+                        Doorways.Add(new ConnectionPoint(currentPos, prefabID, Direction.North));
                         addBlock = true;
                     }
                     else if (ch == 'S')
                     {
-                        Doorways.Add(new ConnectionPoint(currentPos, Direction.South));
+                        Doorways.Add(new ConnectionPoint(currentPos, prefabID, Direction.South));
                         addBlock = true;
                     }
                     else if (ch == 'E')
                     {
-                        Doorways.Add(new ConnectionPoint(currentPos, Direction.East));
+                        Doorways.Add(new ConnectionPoint(currentPos, prefabID, Direction.East));
                         addBlock = true;
                     }
                     else if (ch == 'W')
                     {
-                        Doorways.Add(new ConnectionPoint(currentPos, Direction.West));
+                        Doorways.Add(new ConnectionPoint(currentPos, prefabID, Direction.West));
                         addBlock = true;
                     }
                     else if (ch == 'X')

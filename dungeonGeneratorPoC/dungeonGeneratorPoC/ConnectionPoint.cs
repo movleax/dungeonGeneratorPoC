@@ -19,8 +19,14 @@ namespace dungeonGeneratorPoC
     {
         private Point position;
         private bool connected;
-        Direction facingDirection; 
-
+        private Direction facingDirection;
+        private string PrefabPieceID;
+        
+        public string ID
+        {
+            get { return PrefabPieceID; }
+        }
+        
         public bool isConnected
         {
             get { return connected; }
@@ -28,10 +34,28 @@ namespace dungeonGeneratorPoC
         }
         
         private ConnectionPoint() { }
-        public ConnectionPoint(Point Pos, Direction dir)
+
+        public Direction GetDirection()
+        {
+            return facingDirection;
+        }
+
+        public void setPoint(Point Pos, string p, Direction dir)
+        {
+            if (connected == false)
+                throw new System.Exception("Cannot set a value of a ConnectionPoint if it is being used by a PrefabPiece");
+
+            position = Pos;
+            facingDirection = dir;
+            PrefabPieceID = p;
+            isConnected = false;
+        }
+
+        public ConnectionPoint(Point Pos, string p, Direction dir)
         {
             position = Pos;
             facingDirection = dir;
+            PrefabPieceID = p;
             isConnected = false;
         }
     }
