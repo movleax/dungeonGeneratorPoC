@@ -35,6 +35,11 @@ namespace dungeonGeneratorPoC
         
         private ConnectionPoint() { }
 
+        public Point GetPosition()
+        {
+            return position;
+        }
+
         public Direction GetDirection()
         {
             return facingDirection;

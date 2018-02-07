@@ -34,6 +34,21 @@ namespace dungeonGeneratorPoC
             GeneratePrefabPiece(PrefabFile);
         }
 
+        public Point GetPosition()
+        {
+            return position;
+        }
+
+        public void SetPosition(Point NewPos)
+        {
+            position = NewPos;
+        }
+
+        public Prefab GeneratePrefabPiece()
+        {
+            return new Prefab(position, prefabID, Doorways, rectangles);
+        }
+
         public List<ConnectionPoint> GetConnectionPoints()
         {
             return Doorways;
@@ -42,16 +57,6 @@ namespace dungeonGeneratorPoC
         public string GetPrefabID()
         {
             return prefabID;
-        }
-
-        /// <summary>
-        /// Draw our GameRectangles that we have generated in GeneratePrefabPiece
-        /// </summary>
-        /// <param name="g">Forms control</param>
-        public void draw(Control g)
-        {
-            foreach (var gameRect in rectangles)
-                gameRect.draw(g, this.position);
         }
 
         /// <summary>

@@ -36,6 +36,27 @@ namespace dungeonGeneratorPoC
             return instance;
         }
 
+        public PrefabBluePrint GetPrefabBluePrintUsingID(string ID)
+        {
+            return bluePrints[ID];
+        }
+
+        public List<ConnectionPoint> GetListOfPairedDirections(Direction dir)
+        {
+            List<ConnectionPoint> ret = null;
+
+            switch (dir)
+            {
+                case Direction.North: ret = NorthPoints; break;
+                case Direction.South: ret = SouthPoints; break;
+                case Direction.East: ret = EastPoints; break;
+                case Direction.West: ret = WestPoints; break;
+                default: throw new System.Exception("Invalid direction parameter given");
+            }
+
+            return ret;
+        }
+
         public void AddPrefabBluePrint(PrefabBluePrint pfb)
         {
             // Get a list of the blueprints connection points

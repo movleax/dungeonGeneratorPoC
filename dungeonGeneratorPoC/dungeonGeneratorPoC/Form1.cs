@@ -16,6 +16,7 @@ namespace dungeonGeneratorPoC
     {
         List<Prefab> PrefabPieces = new List<Prefab>();
         ResourceManager resMan = ResourceManager.GetInstance();
+        List<ConnectionPoint> points = new List<ConnectionPoint>();
 
         public Form1()
         {
@@ -25,11 +26,74 @@ namespace dungeonGeneratorPoC
             string prefabContentFolder = ConfigurationManager.AppSettings["prefabFolder"];
             string[] filePaths = Directory.GetFiles(prefabContentFolder, "*.txt");
 
+            points.Add(new ConnectionPoint(new Point(100, 100), "asdfasdfasdf", Direction.East));
+
             // Given our filePaths we found above, create a Prefab and add to our PrefabPieces list
             foreach (var fp in filePaths)
             {
                 resMan.AddPrefabBluePrint(new PrefabBluePrint(fp));
             }
+
+            // check adding a new prefab piece
+            FigureOutConnectionPiece();
+            FigureOutConnectionPiece();
+        }
+
+        private void FigureOutConnectionPiece()
+        {
+            ConnectionPoint cp = points[0];
+            
+            List<ConnectionPoint> cpList = resMan.GetListOfPairedDirections(cp.GetDirection());
+
+            // get a "random" connection point from the list we get back from the resource manager
+            ConnectionPoint randCp = cpList[cpList.Count - 1];
+
+            // make sure the "random" connection point does not belong to the same prefab blueprint piece
+            if(randCp.ID == cp.ID)
+            {
+                // TODO - implement regetting a random connection point
+            }
+
+            // Get the prefabBluePrint piece given the random connection points ID
+            PrefabBluePrint pfb = resMan.GetPrefabBluePrintUsingID(randCp.ID);
+
+            // Move the prefabBlueprint piece to the correct location
+            Point posCalc = pfb.GetPosition();
+
+            // Get the scalar vector difference between the randCp and the pfb. This is assuming prefabBlueprint pieces X,Y is always at the top left corner
+            posCalc.X -= randCp.GetPosition().X;
+            posCalc.Y -= randCp.GetPosition().Y;
+
+            // now add this scalar difference to the position of our original connection point
+            posCalc.X += cp.GetPosition().X;
+            posCalc.Y += cp.GetPosition().Y;
+
+            // finally update the blueprint piece with the new calculated position
+            pfb.SetPosition(posCalc);
+
+            // TODO - implement a way to check collisions
+
+            // We can now Generate a new PrefabPiece. This will Create a new Prefab piece with the current calues of the PrefabBluePrint
+            Prefab p = pfb.GeneratePrefabPiece();
+
+            // Get rid of the Connection Point that we got from RandCp before adding it to our points list
+            p.RemoveConnectionPoint(randCp.GetPosition());
+
+            // Now remove the Connection Point in our points list
+            for (int i = 0; i < points.Count; i++)
+            {
+                if (points[i].GetPosition() == cp.GetPosition())
+                {
+                    points.RemoveAt(i);
+                    break;
+                }
+            }
+
+            // Add all of the connection points from our newly generated Prefab to our points list
+            points.AddRange(p.GetConnectionPoints());
+
+            // now that a pfb has been chosen, make a clone of it to a prefab unit.
+            PrefabPieces.Add(p);
         }
 
         protected override void OnPaint(PaintEventArgs e)
