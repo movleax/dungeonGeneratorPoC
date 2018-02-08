@@ -27,6 +27,11 @@ namespace dungeonGeneratorPoC
             this.rectColor = color;
         }
 
+        public void SetColor(Color c)
+        {
+            rectColor = c;
+        }
+
         /// <summary>
         /// In order to draw a GameRectangle, we must include a parent position.
         /// The parent position will be applied to the gameRect's position.

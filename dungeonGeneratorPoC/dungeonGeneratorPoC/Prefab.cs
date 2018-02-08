@@ -31,8 +31,12 @@ namespace dungeonGeneratorPoC
             position = Pos;
             prefabID = ID;
 
-            Doorways = ConnPoints;
+            Doorways = ConnPoints.Select(cp => new ConnectionPoint(cp)).ToList();
             rectangles = drawRectangles;
+            foreach(var rect in rectangles)
+            {
+                rect.SetColor(color);
+            }
         }
 
         public List<ConnectionPoint> GetConnectionPoints()
@@ -40,11 +44,11 @@ namespace dungeonGeneratorPoC
             return Doorways;
         }
 
-        public void RemoveConnectionPoint(Point pos)
+        public void RemoveConnectionPoint(String ID)
         {
             for(int i=0; i < Doorways.Count; i++)
             {
-                if (Doorways[i].GetPosition() == pos)
+                if (Doorways[i].ID == ID)
                 {
                     Doorways.RemoveAt(i);
                     break;

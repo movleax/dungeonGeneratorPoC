@@ -21,12 +21,18 @@ namespace dungeonGeneratorPoC
         private bool connected;
         private Direction facingDirection;
         private string PrefabPieceID;
-        
-        public string ID
+        private string cpID;
+
+        public string ownerID
         {
             get { return PrefabPieceID; }
         }
-        
+
+        public string ID
+        {
+            get { return cpID; }
+        }
+
         public bool isConnected
         {
             get { return connected; }
@@ -35,9 +41,10 @@ namespace dungeonGeneratorPoC
         
         private ConnectionPoint() { }
 
-        public Point GetPosition()
+        public Point Position
         {
-            return position;
+            get { return position; }
+            set { position = value; }
         }
 
         public Direction GetDirection()
@@ -56,12 +63,24 @@ namespace dungeonGeneratorPoC
             isConnected = false;
         }
 
+        public ConnectionPoint(ConnectionPoint cp)
+        {
+            position = cp.position;
+            facingDirection = cp.facingDirection;
+            PrefabPieceID = cp.PrefabPieceID;
+            isConnected = cp.isConnected;
+
+            cpID = Guid.NewGuid().ToString();
+        }
+
         public ConnectionPoint(Point Pos, string p, Direction dir)
         {
             position = Pos;
             facingDirection = dir;
             PrefabPieceID = p;
             isConnected = false;
+
+            cpID = Guid.NewGuid().ToString();
         }
     }
 }

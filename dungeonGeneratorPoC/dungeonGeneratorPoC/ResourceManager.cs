@@ -45,12 +45,13 @@ namespace dungeonGeneratorPoC
         {
             List<ConnectionPoint> ret = null;
 
+            // set the opposite direction of what our argument is
             switch (dir)
             {
-                case Direction.North: ret = NorthPoints; break;
-                case Direction.South: ret = SouthPoints; break;
-                case Direction.East: ret = EastPoints; break;
-                case Direction.West: ret = WestPoints; break;
+                case Direction.North: ret = SouthPoints; break;
+                case Direction.South: ret = NorthPoints; break;
+                case Direction.East: ret = WestPoints; break;
+                case Direction.West: ret = EastPoints; break;
                 default: throw new System.Exception("Invalid direction parameter given");
             }
 

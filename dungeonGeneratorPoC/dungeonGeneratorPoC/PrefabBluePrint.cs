@@ -41,7 +41,17 @@ namespace dungeonGeneratorPoC
 
         public void SetPosition(Point NewPos)
         {
+            Point deltaPosition = new Point(NewPos.X - position.X, NewPos.Y - position.Y);
             position = NewPos;
+
+            // update Connection point Positions
+            foreach(var cp in Doorways)
+            {
+                Point newRectanglePosition = cp.Position;
+                newRectanglePosition.X = deltaPosition.X + newRectanglePosition.X;
+                newRectanglePosition.Y = deltaPosition.Y + newRectanglePosition.Y;
+                cp.Position = newRectanglePosition;
+            }
         }
 
         public Prefab GeneratePrefabPiece()
@@ -108,12 +118,18 @@ namespace dungeonGeneratorPoC
                     }
                     else if (ch == 'S')
                     {
-                        Doorways.Add(new ConnectionPoint(currentPos, prefabID, Direction.South));
+                        Point adjustedPos = new Point();
+                        adjustedPos.X = currentPos.X;
+                        adjustedPos.Y = currentPos.Y + Constants.RectangleChunk;
+                        Doorways.Add(new ConnectionPoint(adjustedPos, prefabID, Direction.South));
                         addBlock = true;
                     }
                     else if (ch == 'E')
                     {
-                        Doorways.Add(new ConnectionPoint(currentPos, prefabID, Direction.East));
+                        Point adjustedPos = new Point();
+                        adjustedPos.X = currentPos.X + Constants.RectangleChunk;
+                        adjustedPos.Y = currentPos.Y;
+                        Doorways.Add(new ConnectionPoint(adjustedPos, prefabID, Direction.East));
                         addBlock = true;
                     }
                     else if (ch == 'W')
