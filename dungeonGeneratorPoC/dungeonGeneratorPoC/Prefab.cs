@@ -26,7 +26,7 @@ namespace dungeonGeneratorPoC
         /// <param name="PrefabFile">The filepath to the prefab file</param>
         public Prefab(Point Pos, string ID, List<ConnectionPoint> ConnPoints, List<GameRectangle> drawRectangles)
         {
-            Random rand = new Random((int)DateTime.Now.Ticks);
+            Random rand = RandomManager.GetRandomInstance();
             color = Color.FromArgb(rand.Next(256), rand.Next(256), rand.Next(256));
             position = Pos;
             prefabID = ID;

@@ -35,23 +35,41 @@ namespace dungeonGeneratorPoC
             }
 
             // check adding a new prefab piece
-            FigureOutConnectionPiece();
-            FigureOutConnectionPiece();
+            bool retVal_FigureOutConnectionPiece = true;
+
+            for (int i = 0; i < 15 && retVal_FigureOutConnectionPiece; i++)
+            {
+                retVal_FigureOutConnectionPiece = FigureOutConnectionPiece();
+            }
         }
 
-        private void FigureOutConnectionPiece()
+        private bool FigureOutConnectionPiece()
         {
-            ConnectionPoint cp = points[0];
+            Random rand = RandomManager.GetRandomInstance();
+
+            if(points.Count <= 0)
+            {
+                return false;
+            }
+
+            // pick a random point from our list
+            ConnectionPoint cp = points[rand.Next(0, points.Count - 1)];
             
+            // get a list of connections that pair with our chosen connectionPoint
             List<ConnectionPoint> cpList = resMan.GetListOfPairedDirections(cp.GetDirection());
 
-            // get a "random" connection point from the list we get back from the resource manager
-            ConnectionPoint randCp = cpList[cpList.Count - 1];
-
-            // make sure the "random" connection point does not belong to the same prefab blueprint piece
-            if(randCp.ownerID == cp.ownerID)
+            if (cpList.Count <= 0)
             {
-                // TODO - implement regetting a random connection point
+                return false;
+            }
+
+            ConnectionPoint randCp = cpList[rand.Next(0, cpList.Count - 1)];
+
+            // make sure the "random" connection point does not belong to the same prefab blueprint piece. Try to get a unique point, up to 5 times total
+            for (int i = 0; i < 5 && randCp.ownerID == cp.ownerID; i++)
+            {
+                // get a "random" connection point from the list we get back from the resource manager
+                randCp = cpList[rand.Next(0, cpList.Count - 1)];
             }
 
             // Get the prefabBluePrint piece given the random connection points ID
@@ -97,6 +115,8 @@ namespace dungeonGeneratorPoC
 
             // now that a pfb has been chosen, make a clone of it to a prefab unit.
             PrefabPieces.Add(p);
+
+            return true;
         }
 
         protected override void OnPaint(PaintEventArgs e)
