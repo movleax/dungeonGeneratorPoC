@@ -37,7 +37,7 @@ namespace dungeonGeneratorPoC
             // check adding a new prefab piece
             bool retVal_FigureOutConnectionPiece = true;
 
-            for (int i = 0; i < 15 && retVal_FigureOutConnectionPiece; i++)
+            for (int i = 0; i < 100; i++)
             {
                 retVal_FigureOutConnectionPiece = FigureOutConnectionPiece();
             }
@@ -46,8 +46,11 @@ namespace dungeonGeneratorPoC
         private bool FigureOutConnectionPiece()
         {
             Random rand = RandomManager.GetRandomInstance();
+            ConnectionPoint randCp = null;
+            PrefabBluePrint pfb = null;
+            bool prefabBlueprintPieceFound = false;
 
-            if(points.Count <= 0)
+            if (points.Count <= 0)
             {
                 return false;
             }
@@ -63,33 +66,55 @@ namespace dungeonGeneratorPoC
                 return false;
             }
 
-            ConnectionPoint randCp = cpList[rand.Next(0, cpList.Count - 1)];
-
-            // make sure the "random" connection point does not belong to the same prefab blueprint piece. Try to get a unique point, up to 5 times total
-            for (int i = 0; i < 5 && randCp.ownerID == cp.ownerID; i++)
+            // try to find a prefab blueprint piece that will fit. Only do this a couple of times or until find a fitting piece
+            for (int i = 0; i < 10 && !prefabBlueprintPieceFound; i++)
             {
-                // get a "random" connection point from the list we get back from the resource manager
                 randCp = cpList[rand.Next(0, cpList.Count - 1)];
+
+                // make sure the "random" connection point does not belong to the same prefab blueprint piece. Try to get a unique point, up to 5 times total
+                for (int k = 0; k < 5 && randCp.ownerID == cp.ownerID; k++)
+                {
+                    // get a "random" connection point from the list we get back from the resource manager
+                    randCp = cpList[rand.Next(0, cpList.Count - 1)];
+                }
+
+                // Get the prefabBluePrint piece given the random connection points ID
+                pfb = resMan.GetPrefabBluePrintUsingID(randCp.ownerID);
+
+                // Move the prefabBlueprint piece to the correct location
+                Point posCalc = pfb.GetPosition();
+
+                // Get the scalar vector difference between the randCp and the pfb. This is assuming prefabBlueprint pieces X,Y is always at the top left corner
+                posCalc.X -= randCp.Position.X;
+                posCalc.Y -= randCp.Position.Y;
+
+                // now add this scalar difference to the position of our original connection point
+                posCalc.X += cp.Position.X;
+                posCalc.Y += cp.Position.Y;
+
+                // finally update the blueprint piece with the new calculated position
+                pfb.SetPosition(posCalc);
+
+                // check collisions. If the piece doesn't collide with anything, then we know found our piece to place.
+                foreach (var pieces in PrefabPieces)
+                {
+                    prefabBlueprintPieceFound = !pieces.CheckCollision(pfb.GetCollisionBox());
+                }
             }
 
-            // Get the prefabBluePrint piece given the random connection points ID
-            PrefabBluePrint pfb = resMan.GetPrefabBluePrintUsingID(randCp.ownerID);
-
-            // Move the prefabBlueprint piece to the correct location
-            Point posCalc = pfb.GetPosition();
-
-            // Get the scalar vector difference between the randCp and the pfb. This is assuming prefabBlueprint pieces X,Y is always at the top left corner
-            posCalc.X -= randCp.Position.X;
-            posCalc.Y -= randCp.Position.Y;
-
-            // now add this scalar difference to the position of our original connection point
-            posCalc.X += cp.Position.X;
-            posCalc.Y += cp.Position.Y;
-
-            // finally update the blueprint piece with the new calculated position
-            pfb.SetPosition(posCalc);
-
-            // TODO - implement a way to check collisions
+            // if we did not find a piece from the last step above, then we need to remove the connection point
+            if(prefabBlueprintPieceFound == false || pfb == null)
+            {
+                // Now remove the Connection Point in our points list
+                for (int i = 0; i < points.Count; i++)
+                {
+                    if (points[i].ID == cp.ID)
+                    {
+                        points.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
 
             // We can now Generate a new PrefabPiece. This will Create a new Prefab piece with the current calues of the PrefabBluePrint
             Prefab p = pfb.GeneratePrefabPiece();
@@ -108,6 +133,8 @@ namespace dungeonGeneratorPoC
                     points.RemoveAt(i);
                     break;
                 }
+
+                return false;
             }
 
             // Add all of the connection points from our newly generated Prefab to our points list

@@ -8,12 +8,12 @@ using System.Windows.Forms;
 
 namespace dungeonGeneratorPoC
 {
-    class GameRectangle
+    class GameRectangle : ICollidable<CollideBox>
     {
         private Int32 width, height;
         private Point position;
         private Color rectColor;
-
+        private CollideBox cBox;
         // do not allow the outside world to create GameRectangle objects using the default constructor
         private GameRectangle() { }
 
@@ -25,6 +25,7 @@ namespace dungeonGeneratorPoC
             this.width = width;
             this.height = height;
             this.rectColor = color;
+            cBox = new CollideBox(position, width, height);
         }
 
         public void SetColor(Color c)
@@ -66,6 +67,25 @@ namespace dungeonGeneratorPoC
         public Point GetPosition()
         {
             return position;
+        }
+
+        public CollideBox GetCollisionBox()
+        {
+            return cBox;
+        }
+
+        public bool CheckCollision(CollideBox cb)
+        {
+            // if we are in the x and y bounds
+            if(   cBox.X <= cb.X + cb.W  
+               && cBox.X + cBox.W >= cb.X
+               && cBox.Y <= cb.Y + cb.H
+               && cBox.Y + cBox.H >= cb.Y)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace dungeonGeneratorPoC
 {
-    class PrefabBluePrint
+    class PrefabBluePrint : ICollidable<List<GameRectangle>>
     {
         private List<ConnectionPoint> Doorways = new List<ConnectionPoint>();
         private List<GameRectangle> rectangles = new List<GameRectangle>();
@@ -45,7 +45,7 @@ namespace dungeonGeneratorPoC
             position = NewPos;
 
             // update Connection point Positions
-            foreach(var cp in Doorways)
+            foreach (var cp in Doorways)
             {
                 Point newRectanglePosition = cp.Position;
                 newRectanglePosition.X = deltaPosition.X + newRectanglePosition.X;
@@ -167,6 +167,25 @@ namespace dungeonGeneratorPoC
             {
                 MessageBox.Show(e.ToString());
             }
+        }
+
+        public List<GameRectangle> GetCollisionBox()
+        {
+            return rectangles;
+        }
+
+        public bool CheckCollision(List<GameRectangle> t)
+        {
+            foreach (var thisRect in rectangles)
+            {
+                foreach (var tRect in t)
+                {
+                    if (thisRect.CheckCollision(tRect.GetCollisionBox()))
+                        return true;
+                }
+            }
+
+            return false;
         }
     }
 }

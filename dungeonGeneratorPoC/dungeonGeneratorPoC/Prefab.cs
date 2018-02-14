@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace dungeonGeneratorPoC
 {
-    class Prefab
+    class Prefab : ICollidable<List<GameRectangle>>
     {
         private List<ConnectionPoint> Doorways;
         private List<GameRectangle> rectangles;
@@ -64,6 +64,25 @@ namespace dungeonGeneratorPoC
         {
             foreach(var gameRect in rectangles)
                 gameRect.draw(g, this.position);
+        }
+
+        public List<GameRectangle> GetCollisionBox()
+        {
+            return rectangles;
+        }
+
+        public bool CheckCollision(List<GameRectangle> t)
+        {
+            foreach (var thisRect in rectangles)
+            {
+                foreach (var tRect in t)
+                {
+                    if (thisRect.CheckCollision(tRect.GetCollisionBox()))
+                        return true;
+                }
+            }
+
+            return false;
         }
     }
 }
