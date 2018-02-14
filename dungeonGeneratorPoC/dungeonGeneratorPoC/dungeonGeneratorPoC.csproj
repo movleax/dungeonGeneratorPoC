@@ -79,7 +79,15 @@
     <Content Include="resources\corridorReverseJShape.txt" />
     <Content Include="resources\CorridorreverseLShape.txt" />
     <Content Include="resources\corridorVerticalLong.txt" />
+    <Content Include="resources\CrossBig.txt" />
+    <Content Include="resources\CrossSmall.txt" />
     <Content Include="resources\donut.txt" />
+    <Content Include="resources\BigRoomThree.txt" />
+    <Content Include="resources\donutSmall.txt" />
+    <Content Include="resources\T.txt" />
+    <Content Include="resources\TReverse.txt" />
+    <Content Include="resources\TRotateCCW.txt" />
+    <Content Include="resources\TRotateCW.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

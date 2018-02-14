@@ -67,7 +67,7 @@ namespace dungeonGeneratorPoC
             }
 
             // try to find a prefab blueprint piece that will fit. Only do this a couple of times or until find a fitting piece
-            for (int i = 0; i < 10 && !prefabBlueprintPieceFound; i++)
+            for (int i = 0; i < 50 && !prefabBlueprintPieceFound; i++)
             {
                 randCp = cpList[rand.Next(0, cpList.Count - 1)];
 
