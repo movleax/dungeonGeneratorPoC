@@ -16,7 +16,7 @@ namespace dungeonGeneratorPoC
     {
         List<Prefab> PrefabPieces = new List<Prefab>();
         ResourceManager resMan = ResourceManager.GetInstance();
-        List<ConnectionPoint> points = new List<ConnectionPoint>();
+        Queue<ConnectionPoint> points = new Queue<ConnectionPoint>();
 
         public Form1()
         {
@@ -26,7 +26,7 @@ namespace dungeonGeneratorPoC
             string prefabContentFolder = ConfigurationManager.AppSettings["prefabFolder"];
             string[] filePaths = Directory.GetFiles(prefabContentFolder, "*.txt");
             
-            points.Add(new ConnectionPoint(new Point(ClientRectangle.Width / 2, ClientRectangle.Height / 2), "asdfasdfasdf", Direction.East));
+            points.Enqueue(new ConnectionPoint(new Point(ClientRectangle.Width / 2, ClientRectangle.Height / 2), "asdfasdfasdf", Direction.East));
 
             // Given our filePaths we found above, create a Prefab and add to our PrefabPieces list
             foreach (var fp in filePaths)
@@ -37,7 +37,7 @@ namespace dungeonGeneratorPoC
             // check adding a new prefab piece
             bool retVal_FigureOutConnectionPiece = true;
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1; i++)
             {
                 retVal_FigureOutConnectionPiece = FigureOutConnectionPiece();
             }
@@ -56,8 +56,9 @@ namespace dungeonGeneratorPoC
             }
 
             // pick a random point from our list
-            ConnectionPoint cp = points[rand.Next(0, points.Count - 1)];
-            
+            //ConnectionPoint cp = points[rand.Next(0, points.Count - 1)];
+            ConnectionPoint cp = points.Peek();
+
             // get a list of connections that pair with our chosen connectionPoint
             List<ConnectionPoint> cpList = resMan.GetListOfPairedDirections(cp.GetDirection());
 
@@ -95,10 +96,22 @@ namespace dungeonGeneratorPoC
                 // finally update the blueprint piece with the new calculated position
                 pfb.SetPosition(posCalc);
 
-                // check collisions. If the piece doesn't collide with anything, then we know found our piece to place.
-                foreach (var pieces in PrefabPieces)
+                // don't check for collisions if we don't have any pieces placed
+                if (PrefabPieces.Count > 0)
                 {
-                    prefabBlueprintPieceFound = !pieces.CheckCollision(pfb.GetCollisionBox());
+                    // check collisions. If the piece doesn't collide with anything, then we know found our piece to place.
+                    foreach (var pieces in PrefabPieces)
+                    {
+                        prefabBlueprintPieceFound = !pieces.CheckCollision(pfb.GetCollisionBox());
+
+                        // if we have collided into anything let's break
+                        if (prefabBlueprintPieceFound == false)
+                            break;
+                    }
+                }
+                else
+                {
+                    prefabBlueprintPieceFound = true;
                 }
             }
 
@@ -106,14 +119,16 @@ namespace dungeonGeneratorPoC
             if(prefabBlueprintPieceFound == false || pfb == null)
             {
                 // Now remove the Connection Point in our points list
-                for (int i = 0; i < points.Count; i++)
-                {
-                    if (points[i].ID == cp.ID)
-                    {
-                        points.RemoveAt(i);
-                        break;
-                    }
-                }
+                //for (int i = 0; i < points.Count; i++)
+                //{
+                //    if (points[i].ID == cp.ID)
+                //    {
+                //        points.RemoveAt(i);
+                //        break;
+                //    }
+                //}
+                points.Dequeue();
+                return false;
             }
 
             // We can now Generate a new PrefabPiece. This will Create a new Prefab piece with the current calues of the PrefabBluePrint
@@ -126,19 +141,23 @@ namespace dungeonGeneratorPoC
             p.RemoveConnectionPoint(randCp.ID);
 
             // Now remove the Connection Point in our points list
-            for (int i = 0; i < points.Count; i++)
-            {
-                if (points[i].ID == cp.ID)
-                {
-                    points.RemoveAt(i);
-                    break;
-                }
-
-                return false;
-            }
+            //for (int i = 0; i < points.Count; i++)
+            //{
+            //    if (points[i].ID == cp.ID)
+            //    {
+            //        points.RemoveAt(i);
+            //        break;
+            //    }
+            //
+            //    return false;
+            //}
+            points.Dequeue();
 
             // Add all of the connection points from our newly generated Prefab to our points list
-            points.AddRange(p.GetConnectionPoints());
+            //points.AddRange(p.GetConnectionPoints());
+            List<ConnectionPoint> temp = p.GetConnectionPoints();
+            foreach (var t in temp)
+                points.Enqueue(t);
 
             // now that a pfb has been chosen, make a clone of it to a prefab unit.
             PrefabPieces.Add(p);
@@ -155,6 +174,17 @@ namespace dungeonGeneratorPoC
                 p.draw(this);
             }
 
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                
+                FigureOutConnectionPiece();
+                Update();
+                Refresh(); 
+            }
         }
     }
 }

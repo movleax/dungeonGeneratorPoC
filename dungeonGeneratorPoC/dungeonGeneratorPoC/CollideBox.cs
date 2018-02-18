@@ -25,11 +25,13 @@ namespace dungeonGeneratorPoC
         public int X
         {
             get { return pos.X; }
+            set { pos.X = value; }
         }
 
         public int Y
         {
             get { return pos.Y; }
+            set { pos.Y = value; }
         }
 
         public int W

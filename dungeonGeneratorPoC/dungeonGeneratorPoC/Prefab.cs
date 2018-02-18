@@ -32,10 +32,32 @@ namespace dungeonGeneratorPoC
             prefabID = ID;
 
             Doorways = ConnPoints.Select(cp => new ConnectionPoint(cp)).ToList();
-            rectangles = drawRectangles;
+            rectangles = drawRectangles.Select(gr => new GameRectangle(gr)).ToList();
             foreach(var rect in rectangles)
             {
                 rect.SetColor(color);
+            }
+        }
+
+        public void SetPosition(Point NewPos)
+        {
+            Point deltaPosition = new Point(NewPos.X - position.X, NewPos.Y - position.Y);
+            position = NewPos;
+
+            // update Connection point Positions
+            foreach (var cp in Doorways)
+            {
+                Point newRectanglePosition = cp.Position;
+                newRectanglePosition.X = deltaPosition.X + newRectanglePosition.X;
+                newRectanglePosition.Y = deltaPosition.Y + newRectanglePosition.Y;
+                cp.Position = newRectanglePosition;
+            }
+
+            // update GameRectangles Position
+            foreach (var rect in rectangles)
+            {
+                rect.PopToPreviousLocation();
+                rect.PushLocationAndAddNewPosition(position);
             }
         }
 

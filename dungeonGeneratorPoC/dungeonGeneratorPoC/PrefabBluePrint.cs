@@ -52,6 +52,13 @@ namespace dungeonGeneratorPoC
                 newRectanglePosition.Y = deltaPosition.Y + newRectanglePosition.Y;
                 cp.Position = newRectanglePosition;
             }
+
+            // update GameRectangles Position
+            foreach (var rect in rectangles)
+            {
+                rect.PopToPreviousLocation();
+                rect.PushLocationAndAddNewPosition(position);
+            }
         }
 
         public Prefab GeneratePrefabPiece()
