@@ -9,14 +9,8 @@ using System.Windows.Forms;
 
 namespace dungeonGeneratorPoC
 {
-    class Prefab : ICollidable<List<GameRectangle>>
+    class Prefab : AbstractPrefab, IDrawable
     {
-        private List<ConnectionPoint> Doorways;
-        private List<GameRectangle> rectangles;
-        private Point position;
-        private Color color;
-        private string prefabID;
-
         // do not allow prefab objects to be made with the default constructor in the outside world
         private Prefab() { }
 
@@ -39,33 +33,6 @@ namespace dungeonGeneratorPoC
             }
         }
 
-        public void SetPosition(Point NewPos)
-        {
-            Point deltaPosition = new Point(NewPos.X - position.X, NewPos.Y - position.Y);
-            position = NewPos;
-
-            // update Connection point Positions
-            foreach (var cp in Doorways)
-            {
-                Point newRectanglePosition = cp.Position;
-                newRectanglePosition.X = deltaPosition.X + newRectanglePosition.X;
-                newRectanglePosition.Y = deltaPosition.Y + newRectanglePosition.Y;
-                cp.Position = newRectanglePosition;
-            }
-
-            // update GameRectangles Position
-            foreach (var rect in rectangles)
-            {
-                rect.PopToPreviousLocation();
-                rect.PushLocationAndAddNewPosition(position);
-            }
-        }
-
-        public List<ConnectionPoint> GetConnectionPoints()
-        {
-            return Doorways;
-        }
-
         public void RemoveConnectionPoint(String ID)
         {
             for(int i=0; i < Doorways.Count; i++)
@@ -82,29 +49,10 @@ namespace dungeonGeneratorPoC
         /// Draw our GameRectangles that we have generated in GeneratePrefabPiece
         /// </summary>
         /// <param name="g">Forms control</param>
-        public void draw(Control g)
+        public void Draw(Control g)
         {
             foreach(var gameRect in rectangles)
                 gameRect.draw(g, this.position);
-        }
-
-        public List<GameRectangle> GetCollisionBox()
-        {
-            return rectangles;
-        }
-
-        public bool CheckCollision(List<GameRectangle> t)
-        {
-            foreach (var thisRect in rectangles)
-            {
-                foreach (var tRect in t)
-                {
-                    if (thisRect.CheckCollision(tRect.GetCollisionBox()))
-                        return true;
-                }
-            }
-
-            return false;
         }
     }
 }

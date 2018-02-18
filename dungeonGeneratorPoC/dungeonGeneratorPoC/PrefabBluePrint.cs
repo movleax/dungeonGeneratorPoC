@@ -9,71 +9,27 @@ using System.Windows.Forms;
 
 namespace dungeonGeneratorPoC
 {
-    class PrefabBluePrint : ICollidable<List<GameRectangle>>
+    class PrefabBlueprint : AbstractPrefab
     {
-        private List<ConnectionPoint> Doorways = new List<ConnectionPoint>();
-        private List<GameRectangle> rectangles = new List<GameRectangle>();
-        private Point position;
-        private Color color;
-        private string prefabID;
-
         // do not allow prefab objects to be made with the default constructor in the outside world
-        private PrefabBluePrint() { }
+        private PrefabBlueprint() { }
 
         /// <summary>
         /// generates a prefab piece given the Prefab pieces filepath
         /// </summary>
         /// <param name="PrefabFile">The filepath to the prefab file</param>
-        public PrefabBluePrint(String PrefabFile)
+        public PrefabBlueprint(String PrefabFile)
         {
-            Random rand = RandomManager.GetRandomInstance();
-            color = Color.FromArgb(rand.Next(256), rand.Next(256), rand.Next(256));
-            position = new Point(0, 0);
-            prefabID = Guid.NewGuid().ToString();
-
             GeneratePrefabPiece(PrefabFile);
         }
 
-        public Point GetPosition()
-        {
-            return position;
-        }
-
-        public void SetPosition(Point NewPos)
-        {
-            Point deltaPosition = new Point(NewPos.X - position.X, NewPos.Y - position.Y);
-            position = NewPos;
-
-            // update Connection point Positions
-            foreach (var cp in Doorways)
-            {
-                Point newRectanglePosition = cp.Position;
-                newRectanglePosition.X = deltaPosition.X + newRectanglePosition.X;
-                newRectanglePosition.Y = deltaPosition.Y + newRectanglePosition.Y;
-                cp.Position = newRectanglePosition;
-            }
-
-            // update GameRectangles Position
-            foreach (var rect in rectangles)
-            {
-                rect.PopToPreviousLocation();
-                rect.PushLocationAndAddNewPosition(position);
-            }
-        }
-
+        /// <summary>
+        /// Create a Prefab object from this Blueprint's current state
+        /// </summary>
+        /// <returns></returns>
         public Prefab GeneratePrefabPiece()
         {
             return new Prefab(position, prefabID, Doorways, rectangles);
-        }
-
-        public List<ConnectionPoint> GetConnectionPoints()
-        {
-            return Doorways;
-        }
-
-        public string GetPrefabID()
-        {
-            return prefabID;
         }
 
         /// <summary>
@@ -94,7 +50,7 @@ namespace dungeonGeneratorPoC
         /// 
         /// </summary>
         /// <param name="PrefabFile">filepath to the PreFab piece file</param>
-        void GeneratePrefabPiece(string PrefabFile)
+        private void GeneratePrefabPiece(string PrefabFile)
         {
             try
             {
@@ -174,25 +130,6 @@ namespace dungeonGeneratorPoC
             {
                 MessageBox.Show(e.ToString());
             }
-        }
-
-        public List<GameRectangle> GetCollisionBox()
-        {
-            return rectangles;
-        }
-
-        public bool CheckCollision(List<GameRectangle> t)
-        {
-            foreach (var thisRect in rectangles)
-            {
-                foreach (var tRect in t)
-                {
-                    if (thisRect.CheckCollision(tRect.GetCollisionBox()))
-                        return true;
-                }
-            }
-
-            return false;
         }
     }
 }

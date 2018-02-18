@@ -31,7 +31,7 @@ namespace dungeonGeneratorPoC
             // Given our filePaths we found above, create a Prefab and add to our PrefabPieces list
             foreach (var fp in filePaths)
             {
-                resMan.AddPrefabBluePrint(new PrefabBluePrint(fp));
+                resMan.AddPrefabBluePrint(new PrefabBlueprint(fp));
             }
 
             // check adding a new prefab piece
@@ -47,7 +47,7 @@ namespace dungeonGeneratorPoC
         {
             Random rand = RandomManager.GetRandomInstance();
             ConnectionPoint randCp = null;
-            PrefabBluePrint pfb = null;
+            PrefabBlueprint pfb = null;
             bool prefabBlueprintPieceFound = false;
 
             if (points.Count <= 0)
@@ -56,7 +56,6 @@ namespace dungeonGeneratorPoC
             }
 
             // pick a random point from our list
-            //ConnectionPoint cp = points[rand.Next(0, points.Count - 1)];
             ConnectionPoint cp = points.Peek();
 
             // get a list of connections that pair with our chosen connectionPoint
@@ -118,15 +117,6 @@ namespace dungeonGeneratorPoC
             // if we did not find a piece from the last step above, then we need to remove the connection point
             if(prefabBlueprintPieceFound == false || pfb == null)
             {
-                // Now remove the Connection Point in our points list
-                //for (int i = 0; i < points.Count; i++)
-                //{
-                //    if (points[i].ID == cp.ID)
-                //    {
-                //        points.RemoveAt(i);
-                //        break;
-                //    }
-                //}
                 points.Dequeue();
                 return false;
             }
@@ -141,20 +131,9 @@ namespace dungeonGeneratorPoC
             p.RemoveConnectionPoint(randCp.ID);
 
             // Now remove the Connection Point in our points list
-            //for (int i = 0; i < points.Count; i++)
-            //{
-            //    if (points[i].ID == cp.ID)
-            //    {
-            //        points.RemoveAt(i);
-            //        break;
-            //    }
-            //
-            //    return false;
-            //}
             points.Dequeue();
 
             // Add all of the connection points from our newly generated Prefab to our points list
-            //points.AddRange(p.GetConnectionPoints());
             List<ConnectionPoint> temp = p.GetConnectionPoints();
             foreach (var t in temp)
                 points.Enqueue(t);
@@ -171,7 +150,7 @@ namespace dungeonGeneratorPoC
             
             foreach(Prefab p in PrefabPieces)
             {
-                p.draw(this);
+                p.Draw(this);
             }
 
         }
@@ -180,8 +159,10 @@ namespace dungeonGeneratorPoC
         {
             if (e.KeyCode == Keys.Enter)
             {
-                
-                FigureOutConnectionPiece();
+                bool figuredOutNewPiece = false;
+                // try up tp 25 times
+                for(int i=0; i < 25 && !figuredOutNewPiece; i++)
+                    figuredOutNewPiece = FigureOutConnectionPiece();
                 Update();
                 Refresh(); 
             }

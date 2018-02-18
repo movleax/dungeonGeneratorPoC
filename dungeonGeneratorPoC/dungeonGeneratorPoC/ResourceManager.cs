@@ -9,7 +9,7 @@ namespace dungeonGeneratorPoC
 {
     class ResourceManager
     {
-        private Dictionary<string, PrefabBluePrint> bluePrints;
+        private Dictionary<string, PrefabBlueprint> bluePrints;
         private List<ConnectionPoint> NorthPoints;
         private List<ConnectionPoint> SouthPoints;
         private List<ConnectionPoint> EastPoints;
@@ -19,7 +19,7 @@ namespace dungeonGeneratorPoC
 
         private ResourceManager()
         {
-            bluePrints = new Dictionary<string, PrefabBluePrint>();
+            bluePrints = new Dictionary<string, PrefabBlueprint>();
             NorthPoints = new List<ConnectionPoint>();
             SouthPoints = new List<ConnectionPoint>();
             EastPoints = new List<ConnectionPoint>();
@@ -36,7 +36,7 @@ namespace dungeonGeneratorPoC
             return instance;
         }
 
-        public PrefabBluePrint GetPrefabBluePrintUsingID(string ID)
+        public PrefabBlueprint GetPrefabBluePrintUsingID(string ID)
         {
             return bluePrints[ID];
         }
@@ -58,7 +58,7 @@ namespace dungeonGeneratorPoC
             return ret;
         }
 
-        public void AddPrefabBluePrint(PrefabBluePrint pfb)
+        public void AddPrefabBluePrint(PrefabBlueprint pfb)
         {
             // Get a list of the blueprints connection points
             List<ConnectionPoint> BluePrintDoorWays = pfb.GetConnectionPoints();
