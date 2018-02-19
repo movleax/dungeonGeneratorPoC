@@ -14,158 +14,47 @@ namespace dungeonGeneratorPoC
 {
     public partial class Form1 : Form
     {
-        List<Prefab> PrefabPieces = new List<Prefab>();
-        ResourceManager resMan = ResourceManager.GetInstance();
-        Queue<ConnectionPoint> points = new Queue<ConnectionPoint>();
+        private GameManager gm = null;
+        private Timer t = null;
 
         public Form1()
         {
             InitializeComponent();
-            
-            // Get the prefabrication directory from our app config value, then get a list of .txt files from that path.
-            string prefabContentFolder = ConfigurationManager.AppSettings["prefabFolder"];
-            string[] filePaths = Directory.GetFiles(prefabContentFolder, "*.txt");
-            
-            points.Enqueue(new ConnectionPoint(new Point(ClientRectangle.Width / 2, ClientRectangle.Height / 2), "asdfasdfasdf", Direction.East));
 
-            // Given our filePaths we found above, create a Prefab and add to our PrefabPieces list
-            foreach (var fp in filePaths)
-            {
-                resMan.AddPrefabBluePrint(new PrefabBlueprint(fp));
-            }
-
-            // check adding a new prefab piece
-            bool retVal_FigureOutConnectionPiece = true;
-
-            for (int i = 0; i < 1; i++)
-            {
-                retVal_FigureOutConnectionPiece = FigureOutConnectionPiece();
-            }
+            GameManager.SetContextWindow(this);
+            gm = GameManager.GetInstance();
         }
 
-        private bool FigureOutConnectionPiece()
-        {
-            Random rand = RandomManager.GetRandomInstance();
-            ConnectionPoint randCp = null;
-            PrefabBlueprint pfb = null;
-            bool prefabBlueprintPieceFound = false;
-
-            if (points.Count <= 0)
-            {
-                return false;
-            }
-
-            // pick a random point from our list
-            ConnectionPoint cp = points.Peek();
-
-            // get a list of connections that pair with our chosen connectionPoint
-            List<ConnectionPoint> cpList = resMan.GetListOfPairedDirections(cp.GetDirection());
-
-            if (cpList.Count <= 0)
-            {
-                return false;
-            }
-
-            // try to find a prefab blueprint piece that will fit. Only do this a couple of times or until find a fitting piece
-            for (int i = 0; i < 50 && !prefabBlueprintPieceFound; i++)
-            {
-                randCp = cpList[rand.Next(0, cpList.Count - 1)];
-
-                // make sure the "random" connection point does not belong to the same prefab blueprint piece. Try to get a unique point, up to 5 times total
-                for (int k = 0; k < 5 && randCp.ownerID == cp.ownerID; k++)
-                {
-                    // get a "random" connection point from the list we get back from the resource manager
-                    randCp = cpList[rand.Next(0, cpList.Count - 1)];
-                }
-
-                // Get the prefabBluePrint piece given the random connection points ID
-                pfb = resMan.GetPrefabBluePrintUsingID(randCp.ownerID);
-
-                // Move the prefabBlueprint piece to the correct location
-                Point posCalc = pfb.GetPosition();
-
-                // Get the scalar vector difference between the randCp and the pfb. This is assuming prefabBlueprint pieces X,Y is always at the top left corner
-                posCalc.X -= randCp.Position.X;
-                posCalc.Y -= randCp.Position.Y;
-
-                // now add this scalar difference to the position of our original connection point
-                posCalc.X += cp.Position.X;
-                posCalc.Y += cp.Position.Y;
-
-                // finally update the blueprint piece with the new calculated position
-                pfb.SetPosition(posCalc);
-
-                // don't check for collisions if we don't have any pieces placed
-                if (PrefabPieces.Count > 0)
-                {
-                    // check collisions. If the piece doesn't collide with anything, then we know found our piece to place.
-                    foreach (var pieces in PrefabPieces)
-                    {
-                        prefabBlueprintPieceFound = !pieces.CheckCollision(pfb.GetCollisionBox());
-
-                        // if we have collided into anything let's break
-                        if (prefabBlueprintPieceFound == false)
-                            break;
-                    }
-                }
-                else
-                {
-                    prefabBlueprintPieceFound = true;
-                }
-            }
-
-            // if we did not find a piece from the last step above, then we need to remove the connection point
-            if(prefabBlueprintPieceFound == false || pfb == null)
-            {
-                points.Dequeue();
-                return false;
-            }
-
-            // We can now Generate a new PrefabPiece. This will Create a new Prefab piece with the current calues of the PrefabBluePrint
-            Prefab p = pfb.GeneratePrefabPiece();
-
-            // Reset the Prefab BluePrint
-            pfb.SetPosition(new Point(0, 0));
-
-            // Get rid of the Connection Point that we got from RandCp before adding it to our points list
-            p.RemoveConnectionPoint(randCp.ID);
-
-            // Now remove the Connection Point in our points list
-            points.Dequeue();
-
-            // Add all of the connection points from our newly generated Prefab to our points list
-            List<ConnectionPoint> temp = p.GetConnectionPoints();
-            foreach (var t in temp)
-                points.Enqueue(t);
-
-            // now that a pfb has been chosen, make a clone of it to a prefab unit.
-            PrefabPieces.Add(p);
-
-            return true;
-        }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            
-            foreach(Prefab p in PrefabPieces)
-            {
-                p.Draw(this);
-            }
+            gm.Draw();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            t = new Timer();
+            t.Interval = 125;
+            t.Enabled = true;
+            t.Start();
+            t.Tick += new EventHandler(TimerTickEvent);
 
         }
 
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        private void TimerTickEvent(object sender, EventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
-            {
-                bool figuredOutNewPiece = false;
-                // try up tp 25 times
-                for(int i=0; i < 25 && !figuredOutNewPiece; i++)
-                    figuredOutNewPiece = FigureOutConnectionPiece();
-                Update();
-                Refresh(); 
-            }
+            gm.GenerateNewPiece();
+        }
+
+        private void Form1_Leave(object sender, EventArgs e)
+        {
+            t.Stop();
+        }
+
+        private void Form1_Enter(object sender, EventArgs e)
+        {
+            t.Start();
         }
     }
 }
