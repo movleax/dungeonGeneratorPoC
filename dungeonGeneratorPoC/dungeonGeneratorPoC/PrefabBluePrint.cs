@@ -56,6 +56,7 @@ namespace dungeonGeneratorPoC
             {
                 // open a stream reader to the prefab file
                 StreamReader reader = new StreamReader(PrefabFile);
+                string line = "";
                 char ch;
 
                 // We will use this Point to calculate a GameRectangle's position
@@ -66,59 +67,61 @@ namespace dungeonGeneratorPoC
 
                 do
                 {
-                    // first read our input char and set it to Upper Case
-                    ch = (char)reader.Read();
-                    ch = Char.ToUpper(ch);
+                    // read a line into our string
+                    line = reader.ReadLine();
 
-                    // assume that we aren't adding a GameRectangle this current iteration
-                    addBlock = false;
+                    foreach (var character in line)
+                    {
 
-                    // check the ascii value and respond appropriately (see function header for details)
-                    if (ch == 'N')
-                    {
-                        Doorways.Add(new ConnectionPoint(currentPos, prefabID, Direction.North));
-                        addBlock = true;
-                    }
-                    else if (ch == 'S')
-                    {
-                        Point adjustedPos = new Point();
-                        adjustedPos.X = currentPos.X;
-                        adjustedPos.Y = currentPos.Y + Constants.RectangleChunk;
-                        Doorways.Add(new ConnectionPoint(adjustedPos, prefabID, Direction.South));
-                        addBlock = true;
-                    }
-                    else if (ch == 'E')
-                    {
-                        Point adjustedPos = new Point();
-                        adjustedPos.X = currentPos.X + Constants.RectangleChunk;
-                        adjustedPos.Y = currentPos.Y;
-                        Doorways.Add(new ConnectionPoint(adjustedPos, prefabID, Direction.East));
-                        addBlock = true;
-                    }
-                    else if (ch == 'W')
-                    {
-                        Doorways.Add(new ConnectionPoint(currentPos, prefabID, Direction.West));
-                        addBlock = true;
-                    }
-                    else if (ch == 'X')
-                    {
-                        addBlock = true;
-                    }
+                        // first read our input char and set it to Upper Case
+                        ch = Char.ToUpper(character);
 
-                    // adjust our calculated point position
-                    if (ch == '\r')
-                    {
-                        currentPos.X = 0;
-                        currentPos.Y += Constants.RectangleChunk;
-                    }
-                    else if (ch != '\n')
-                    {
+                        // assume that we aren't adding a GameRectangle this current iteration
+                        addBlock = false;
+
+                        // check the ascii value and respond appropriately (see function header for details)
+                        if (ch == 'N')
+                        {
+                            Doorways.Add(new ConnectionPoint(currentPos, prefabID, Direction.North));
+                            addBlock = true;
+                        }
+                        else if (ch == 'S')
+                        {
+                            Point adjustedPos = new Point();
+                            adjustedPos.X = currentPos.X;
+                            adjustedPos.Y = currentPos.Y + Constants.RectangleChunk;
+                            Doorways.Add(new ConnectionPoint(adjustedPos, prefabID, Direction.South));
+                            addBlock = true;
+                        }
+                        else if (ch == 'E')
+                        {
+                            Point adjustedPos = new Point();
+                            adjustedPos.X = currentPos.X + Constants.RectangleChunk;
+                            adjustedPos.Y = currentPos.Y;
+                            Doorways.Add(new ConnectionPoint(adjustedPos, prefabID, Direction.East));
+                            addBlock = true;
+                        }
+                        else if (ch == 'W')
+                        {
+                            Doorways.Add(new ConnectionPoint(currentPos, prefabID, Direction.West));
+                            addBlock = true;
+                        }
+                        else if (ch == 'X')
+                        {
+                            addBlock = true;
+                        }
+
+                        // adjust our calculated point position
                         currentPos.X += Constants.RectangleChunk;
+
+                        // add a game rectangle to our prefab list 
+                        if (addBlock)
+                            rectangles.Add(new GameRectangle(currentPos.X, currentPos.Y, Constants.RectangleChunk, Constants.RectangleChunk, color));
                     }
 
-                    // add a game rectangle to our prefab list 
-                    if (addBlock)
-                        rectangles.Add(new GameRectangle(currentPos.X, currentPos.Y, Constants.RectangleChunk, Constants.RectangleChunk, color));
+                    // once we read a line, reset the coordinates X and Y to 0 and +10, respectively
+                    currentPos.X = 0;
+                    currentPos.Y += Constants.RectangleChunk;
 
                 } while (!reader.EndOfStream);
 
