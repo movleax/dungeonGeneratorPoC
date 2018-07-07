@@ -15,6 +15,7 @@ namespace dungeonGeneratorPoC
         private Color rectColor;
         private CollideBox cBox;
         private Stack<Point> savePositions;
+        System.Drawing.SolidBrush myBrush;
 
         // do not allow the outside world to create GameRectangle objects using the default constructor
         private GameRectangle() { }
@@ -30,6 +31,13 @@ namespace dungeonGeneratorPoC
             cBox = new CollideBox(position, width, height);
             savePositions = new Stack<Point>();
             PushLocation(); // push the first original position of the GameRectangle
+
+            myBrush = new System.Drawing.SolidBrush(rectColor);
+        }
+
+        ~GameRectangle()
+        {
+            myBrush.Dispose();
         }
 
         // Copy Constructor
@@ -42,6 +50,7 @@ namespace dungeonGeneratorPoC
             this.rectColor = gr.rectColor;
             cBox = new CollideBox(position, width, height);
             savePositions = new Stack<Point>(gr.savePositions.Reverse());
+            myBrush = new System.Drawing.SolidBrush(rectColor);
             //PushLocation(); // push the first original position of the GameRectangle
         }
 
@@ -87,22 +96,15 @@ namespace dungeonGeneratorPoC
         /// </summary>
         /// <param name="g">form's Control</param>
         /// <param name="parentPosition">The parents position</param>
-        public void draw(Control g, Point parentPosition)
+        public void draw(PaintEventArgs e, Point parentPosition)
         {
-
-            draw(g);
-
+            draw(e);
         }
 
         // see the overloaded public draw method
-        private void draw(Control g)
+        private void draw(PaintEventArgs e)
         {
-            System.Drawing.SolidBrush myBrush = new System.Drawing.SolidBrush(rectColor);
-            System.Drawing.Graphics formGraphics;
-            formGraphics = g.CreateGraphics();
-            formGraphics.FillRectangle(myBrush, new Rectangle(position.X, position.Y, width, height));
-            myBrush.Dispose();
-            formGraphics.Dispose();
+            e.Graphics.FillRectangle(myBrush, new Rectangle(position.X, position.Y, width, height));
         }
 
         public Point GetPosition()

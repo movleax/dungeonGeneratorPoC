@@ -49,10 +49,10 @@ namespace dungeonGeneratorPoC
         /// Draw our GameRectangles that we have generated in GeneratePrefabPiece
         /// </summary>
         /// <param name="g">Forms control</param>
-        public void Draw(Control g)
+        public void Draw(PaintEventArgs e)
         {
             foreach(var gameRect in rectangles)
-                gameRect.draw(g, this.position);
+                gameRect.draw(e, this.position);
         }
     }
 }

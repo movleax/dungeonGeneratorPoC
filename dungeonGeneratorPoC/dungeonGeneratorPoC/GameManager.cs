@@ -183,16 +183,16 @@ namespace dungeonGeneratorPoC
             return true;
         }
 
-        public void Draw()
+        public void Draw(PaintEventArgs e)
         {
-            if (window == null)
+            if (e == null)
             {
-                throw new System.NullReferenceException("Must define window context before using Draw!");
+                throw new System.ArgumentNullException("Argument cannot be null!");
             }
 
             foreach (IDrawable p in PrefabPieces)
             {
-                p.Draw(window);
+                p.Draw(e);
             }
         }
     }

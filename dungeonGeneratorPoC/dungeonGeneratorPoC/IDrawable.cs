@@ -9,6 +9,6 @@ namespace dungeonGeneratorPoC
 {
     interface IDrawable
     {
-        void Draw(Control g);
+        void Draw(PaintEventArgs e);
     }
 }

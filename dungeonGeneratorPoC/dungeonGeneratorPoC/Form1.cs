@@ -29,7 +29,7 @@ namespace dungeonGeneratorPoC
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            gm.Draw();
+            gm.Draw(e);
         }
 
         private void Form1_Load(object sender, EventArgs e)
