@@ -16,7 +16,6 @@ namespace dungeonGeneratorPoC
     {
         private GameManager gm = null;
         private Timer t = null;
-        bool oneTimeWait = true;
 
         public Form1()
         {
@@ -28,16 +27,9 @@ namespace dungeonGeneratorPoC
             gm = GameManager.GetInstance();
         }
 
-
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-
-            if(oneTimeWait)
-            {
-                System.Threading.Thread.Sleep(10000);
-                oneTimeWait = false;
-            }
 
             gm.Draw(e);
         }
